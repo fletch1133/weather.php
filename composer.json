@@ -1,0 +1,11 @@
+{
+    "name": "your/project-name",
+    "require": {
+        "laravel/framework": "^10.34"
+    },
+    "autoload": {
+        "psr-4": {
+            "WeatherApp\\": "app/"
+        }
+    } 
+}
