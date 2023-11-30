@@ -142,6 +142,32 @@ class Account extends Model {
     }
 }
 
+class Country extends Model {
+    protected $table = 'countries';
+    protected $primaryKey = 'id';
+    public $timestamps = false;
+
+    protected $fillable = [
+        'country',
+        'city',
+        'user_id',
+    ];
+
+    protected $casts = [
+        'country' => [
+            'type' => 'string',
+            'length' => 100,
+            'nullable' = false,
+        ]
+        
+        'city' => [
+            'type' = 'string',
+            'length' = 100,
+            'nullable' = false,
+        ]
+    ]
+}
+
 class City extends Model {
     protected $table = 'cities';
     protected $primaryKey = 'id';
@@ -173,32 +199,6 @@ class City extends Model {
     }
 }
 
-class Country extends Model {
-    protected $table = 'countries';
-    protected $primaryKey = 'id';
-    public $timestamps = false;
-
-    protected $fillable = [
-        'country',
-        'city',
-        'user_id',
-    ];
-
-    protected $casts = [
-        'country' => [
-            'type' => 'string',
-            'length' => 100,
-            'nullable' = false,
-        ]
-        
-        'city' => [
-            'type' = 'string',
-            'length' = 100,
-            'nullable' = false,
-        ]
-    ]
-}
-
 class Favorite extends Model {
     protected $table = 'favorites';
     protected $primaryKey = 'id';
@@ -226,5 +226,15 @@ class Favorite extends Model {
         parent::__construct($attributes); 
     }
 }
+
+
+require __DIR__.'/vendor/autoload.php';
+
+$app = require_once __DIR__.'/bootstrap/app.php';
+
+$capsule = new Capsule;
+$capsule->addConnectionn($app['config']['database.connections'][env('DB_CONNECTION', 'pgsql')]);
+$capsule->setAsGlobal();
+$capsule->bootEloquent();  
 
 ?>
