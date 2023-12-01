@@ -53,6 +53,10 @@ class Weather extends Model {
     public function getDateFormat() {
         return 'Y-m-d H:i:s';
     } 
+
+    public function city() {
+        return $this->belongsTo(City::class);
+    }
 }
 
 //function create_weather($location, $temperature, $humidity, $wind_speed, $conditions) {
@@ -67,6 +71,84 @@ class Weather extends Model {
 //    return $weather;
 //} 
 
+
+class Country extends Model {
+    protected $table = 'countries';
+    protected $primaryKey = 'id';
+    public $timestamps = false; 
+
+    protected $fillable = [
+        'country',
+        'city', 
+        'user_id',
+    ];
+
+    protected $casts = [
+        'country' => [
+            'type' => 'string',
+            'length' => 100,
+            'nullable' => false,
+        ]
+        
+        'city' => [
+            'type' => 'string',
+            'length' => 100,
+            'nullable' => false,
+        ]
+
+        'user_id' => [
+            'type' => 'integer',
+            'nullable' => false, 
+        ]
+    ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+}
+
+class City extends Model {
+    protected $table = 'cities';
+    protected $primaryKey = 'id';
+    public $timestamps = false;
+ 
+    protected $fillable = [
+        'city',
+        'country',
+        'user_id',
+    ];
+
+    protected $casts = [
+        'city' => [
+            'type' => 'string',
+            'length' => 100,
+            'nullable' => true,
+        ],
+
+        'country' => [
+            'type' => 'string',
+            'length' => 100,
+            'nullbale' => false,
+        ]
+
+        'user_id' => [
+            'type' => 'integer',
+            'nullable' => false, 
+        ]
+    ];
+
+    public function __construct(array $attributes = []) {
+        parent::__construct($attributes); 
+    } 
+
+    public function __toString() { 
+        return sprintf('<City id=%s city=%s user_id=%s', $this->id, $this->city, $this->user_id);
+    }
+
+    public function weather() {
+        return $this->hasOne(Weather::class);
+    }
+}
 
 class User extends Model {
     protected $table = 'users';
@@ -99,6 +181,14 @@ class User extends Model {
 
     public function __toString() {
         return sprintf('<User id=%s email=%s>', $this->id, $this->email);
+    }
+
+    public function countries() {
+        return $this->hasMany(Country::class);
+    }
+
+    public function accounts() {
+        return $this->hasMany(Account::class); 
     }
 }
 
@@ -140,62 +230,9 @@ class Account extends Model {
     public function __toString() {
         return sprintf('<User id=%s account=%s', $this->id, $this->account);
     }
-}
 
-class Country extends Model {
-    protected $table = 'countries';
-    protected $primaryKey = 'id';
-    public $timestamps = false;
-
-    protected $fillable = [
-        'country',
-        'city',
-        'user_id',
-    ];
-
-    protected $casts = [
-        'country' => [
-            'type' => 'string',
-            'length' => 100,
-            'nullable' = false,
-        ]
-        
-        'city' => [
-            'type' = 'string',
-            'length' = 100,
-            'nullable' = false,
-        ]
-    ]
-}
-
-class City extends Model {
-    protected $table = 'cities';
-    protected $primaryKey = 'id';
-    public $timestamps = false;
-
-    protected $fillable = [
-        'city',
-        'user_id',
-    ];
-
-    protected $casts = [
-        'city' => [
-            'type' => 'integer',
-            'nullable' => true,
-        ],
-
-        'user_id' => [
-            'type' => 'integer',
-            'nullable' => false, 
-        ]
-    ];
-
-    public function __construct(array $attributes = []) {
-        parent::__construct($attributes); 
-    } 
-
-    public function __toString() { 
-        return sprintf('<City id=%s city=%s user_id=%s', $this->id, $this->city, $this->user_id);
+    public function user() {
+        return $this->belongsTo(User::class);
     }
 }
 
@@ -224,6 +261,10 @@ class Favorite extends Model {
 
     public function __construct(array $attributes = []) {
         parent::__construct($attributes); 
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class); 
     }
 }
 
