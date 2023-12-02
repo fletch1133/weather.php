@@ -57,7 +57,8 @@ function create_account($weather, $user = null) {
 //New instance of acc model, initial it with assoc. array where key weather
 //Corresponds to weather param
 
-    if ($user) {
+    if ($user) { 
+//Check if user exists
         $account->user()->associate($user);
     }
 //Check is user param is not null, if provided asoc user with account using
@@ -120,13 +121,17 @@ function delete_weather($weatherId) {
 
 function get_user_favorite_cities($userId) {
     $user = User::find($userId);
-//
+//Uses User model to find user_id, find meth. is meth that retrieves model
+//By primary key
     if ($user) {
-        return $user->favoriteCities; 
+//Checking if user exists
+        return $user->favoriteCities;
+//If user exists, returns their favorite citites
     }
 
-    return null;
-}
+    return null; 
+//Return null if user isnt found
+} 
 
 function get_weather_by_city($cityName) {
     $city = City::where('name', $cityName)->first();

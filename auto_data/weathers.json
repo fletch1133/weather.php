@@ -1,0 +1,43 @@
+[
+    {
+        "apiKey": "d1c4f27fc31bce1425a6079e248a8bde"
+
+    },
+    
+    {
+        "id": 1,
+        "location": "New York",
+        "country": "United States",
+        "temperature": 70,
+        "humidity": 60,
+        "wind_speed": 10,
+        "conditions": "Clear"
+    },
+    {
+        "id": 2,
+        "location": "London",
+        "country": "England",
+        "temperature": 55,
+        "humidity": 20,
+        "wind_speed": 25,
+        "conditions": "Cloudy"
+    },
+    {
+        "id": 3,
+        "location": "Toyko",
+        "country": "Japan",
+        "temperature": 61,
+        "humidity": 37,
+        "wind_speed": 4,
+        "conditions": "Sunny"
+    },
+    {
+        "id": 4,
+        "location": "Paris",
+        "country": "France",
+        "temperature": 77,
+        "humidity": 64,
+        "wind_speed": 0,
+        "conditions": "Sunny"
+    },
+]
