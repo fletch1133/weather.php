@@ -13,7 +13,7 @@ class Weather extends Model {
         'location', 
         'temperature',
         'humidity', 
-        'wind_speed',
+        'wind_speed', 
         'conditions', 
     ]; 
 

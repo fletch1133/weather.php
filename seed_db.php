@@ -1,11 +1,19 @@
 <?php
 
 use Illuminate\Database\Capsule\Manager as Capsule;
+//Imports Capsule manager from Ill\DB namespace annd gives it alias Capsule
+
 use Illuminate\Database\Schema\Blueprint;
+//Import Blueprint class from I\D\S, used for def. structure of DB tables
 
 require __DIR__.'/vendor/autoload.php';
+//Includes composer autoloader, manager dependencies and ensures that classes
+//Are loaded automatically
 
 $capsule = new Capsule;
+//Creates new instance of capsule manager, part of Eloquent ORM in Laravel
+//Convenient way to work with DB's
+
 $capsule->addConnection([
     'driver' => 'pgsql',
     'host' => 'localhost',
@@ -16,9 +24,13 @@ $capsule->addConnection([
     'collation' => 'utf8_unicode_ci',
     'prefix' => '', 
 ]);
+//Adds DB config to Capsule, arr passed as arg, 'driver' = details
 
 $capsule->setAsGlobal();
+//Sets Capsule manager as global, easy to use the DB across different parts of code
+
 $capsule->bootEloquent();
+//Boots up Eloquent ORM, initializes Eloquent to work with configured DB connections
 
 
 Capsule::schema()->dropIfExists('weathers');

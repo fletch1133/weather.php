@@ -93,7 +93,7 @@ function get_weather_by_country_and_city($countryName, $cityName) {
     return $weather;
 //Returns result of query, if ! returns null
 }
-
+ 
 
 //UNSURE ABOUT THESE CURR FUNCS
 

@@ -7,7 +7,7 @@
     {
         "id": 1,
         "location": "New York",
-        "country": "United States",
+        "country": "US",
         "temperature": 70,
         "humidity": 60,
         "wind_speed": 10,
@@ -16,7 +16,7 @@
     {
         "id": 2,
         "location": "London",
-        "country": "England",
+        "country": "GB",
         "temperature": 55,
         "humidity": 20,
         "wind_speed": 25,
@@ -25,7 +25,7 @@
     {
         "id": 3,
         "location": "Toyko",
-        "country": "Japan",
+        "country": "JP",
         "temperature": 61,
         "humidity": 37,
         "wind_speed": 4,
@@ -34,10 +34,64 @@
     {
         "id": 4,
         "location": "Paris",
-        "country": "France",
+        "country": "FR",
         "temperature": 77,
         "humidity": 64,
         "wind_speed": 0,
         "conditions": "Sunny"
     },
+    {
+        "id": 5,
+        "location": "Berlin",
+        "country": "DE",
+        "temperature": 62,
+        "humidity": 24,
+        "wind_speed": 15,
+        "conditions": "Cloudy"
+    },
+    {
+        "id": 6,
+        "location": "Scranton",
+        "country": "US",
+        "temperature": 44,
+        "humidity": 16,
+        "wind_speed": 10,
+        "conditions": "Gloomy"
+    },
+    {
+        "id": 7,
+        "location": "Charleston",
+        "country": "US",
+        "temperature": 81,
+        "humidity": 72,
+        "wind_speed": 3,
+        "conditions": "Sunny"
+    },
+    {
+        "id": 8,
+        "location": "Shanghai",
+        "country": "CN",
+        "temperature": 58,
+        "humidity": 33,
+        "wind_speed": 6,
+        "conditions": "Cloudy"
+    },
+    {
+        "id": 9,
+        "location": "Rome",
+        "country": "IT",
+        "temperature": 86,
+        "humidity": 88,
+        "wind_speed": 2,
+        "conditions": "Sunny"
+    },
+    {
+        "id": 10,
+        "location": "Los Angeles", 
+        "country": "US",
+        "temperature": 71,
+        "humidity": 60,
+        "wind_speed": 0,
+        "conditions": "Sunny"
+    }
 ]

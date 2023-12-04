@@ -1,0 +1,7 @@
+[2023-12-01 12:30:00] Fetching weather data
+[2023-12-01 12:30:05] Error fetching weather data for New York, US: Invalid API response
+[2023-12-01 12:30:10] Error fetching weather data for London, GB: Connection Timeout
+[2023-12-01 12:30:15] Error fetching weather data for Tokyo, JP:
+[2023-12-01 12:31:00] Error fetching weather data for Paris, FR:
+[2023-12-01 12:31:05] Error fetching weather data for Shanghi, CN;
+[2023-12-01 12:32:00] Weather data saved to weathers.json
