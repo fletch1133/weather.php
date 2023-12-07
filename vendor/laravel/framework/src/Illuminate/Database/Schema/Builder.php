@@ -3,10 +3,10 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
-use Illuminate\Container\Container;
+use Doctrine\DBAL\Types\Type;
 use Illuminate\Database\Connection;
-use InvalidArgumentException;
 use LogicException;
+use RuntimeException;
 
 class Builder
 {
@@ -34,23 +34,9 @@ class Builder
     /**
      * The default string length for migrations.
      *
-     * @var int|null
+     * @var int
      */
     public static $defaultStringLength = 255;
-
-    /**
-     * The default relationship morph key type.
-     *
-     * @var string
-     */
-    public static $defaultMorphKeyType = 'int';
-
-    /**
-     * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping, renaming, and modifying columns.
-     *
-     * @var bool
-     */
-    public static $alwaysUsesNativeSchemaOperationsIfPossible = false;
 
     /**
      * Create a new database Schema manager.
@@ -76,80 +62,6 @@ class Builder
     }
 
     /**
-     * Set the default morph key type for migrations.
-     *
-     * @param  string  $type
-     * @return void
-     *
-     * @throws \InvalidArgumentException
-     */
-    public static function defaultMorphKeyType(string $type)
-    {
-        if (! in_array($type, ['int', 'uuid', 'ulid'])) {
-            throw new InvalidArgumentException("Morph key type must be 'int', 'uuid', or 'ulid'.");
-        }
-
-        static::$defaultMorphKeyType = $type;
-    }
-
-    /**
-     * Set the default morph key type for migrations to UUIDs.
-     *
-     * @return void
-     */
-    public static function morphUsingUuids()
-    {
-        return static::defaultMorphKeyType('uuid');
-    }
-
-    /**
-     * Set the default morph key type for migrations to ULIDs.
-     *
-     * @return void
-     */
-    public static function morphUsingUlids()
-    {
-        return static::defaultMorphKeyType('ulid');
-    }
-
-    /**
-     * Attempt to use native schema operations for dropping, renaming, and modifying columns, even if Doctrine DBAL is installed.
-     *
-     * @param  bool  $value
-     * @return void
-     */
-    public static function useNativeSchemaOperationsIfPossible(bool $value = true)
-    {
-        static::$alwaysUsesNativeSchemaOperationsIfPossible = $value;
-    }
-
-    /**
-     * Create a database in the schema.
-     *
-     * @param  string  $name
-     * @return bool
-     *
-     * @throws \LogicException
-     */
-    public function createDatabase($name)
-    {
-        throw new LogicException('This database driver does not support creating databases.');
-    }
-
-    /**
-     * Drop a database from the schema if the database exists.
-     *
-     * @param  string  $name
-     * @return bool
-     *
-     * @throws \LogicException
-     */
-    public function dropDatabaseIfExists($name)
-    {
-        throw new LogicException('This database driver does not support dropping databases.');
-    }
-
-    /**
      * Determine if the given table exists.
      *
      * @param  string  $table
@@ -159,51 +71,9 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        foreach ($this->getTables() as $value) {
-            if (strtolower($table) === strtolower($value['name'])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Get the tables that belong to the database.
-     *
-     * @return array
-     */
-    public function getTables()
-    {
-        return $this->connection->getPostProcessor()->processTables(
-            $this->connection->selectFromWriteConnection($this->grammar->compileTables())
-        );
-    }
-
-    /**
-     * Get the views that belong to the database.
-     *
-     * @return array
-     */
-    public function getViews()
-    {
-        return $this->connection->getPostProcessor()->processViews(
-            $this->connection->selectFromWriteConnection($this->grammar->compileViews())
-        );
-    }
-
-    /**
-     * Get all of the table names for the database.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @return array
-     *
-     * @throws \LogicException
-     */
-    public function getAllTables()
-    {
-        throw new LogicException('This database driver does not support getting all tables.');
+        return count($this->connection->selectFromWriteConnection(
+            $this->grammar->compileTableExists(), [$table]
+        )) > 0;
     }
 
     /**
@@ -241,60 +111,17 @@ class Builder
     }
 
     /**
-     * Execute a table builder callback if the given table has a given column.
-     *
-     * @param  string  $table
-     * @param  string  $column
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public function whenTableHasColumn(string $table, string $column, Closure $callback)
-    {
-        if ($this->hasColumn($table, $column)) {
-            $this->table($table, fn (Blueprint $table) => $callback($table));
-        }
-    }
-
-    /**
-     * Execute a table builder callback if the given table doesn't have a given column.
-     *
-     * @param  string  $table
-     * @param  string  $column
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback)
-    {
-        if (! $this->hasColumn($table, $column)) {
-            $this->table($table, fn (Blueprint $table) => $callback($table));
-        }
-    }
-
-    /**
      * Get the data type for the given column name.
      *
      * @param  string  $table
      * @param  string  $column
-     * @param  bool  $fullDefinition
      * @return string
      */
-    public function getColumnType($table, $column, $fullDefinition = false)
+    public function getColumnType($table, $column)
     {
-        if (! $this->connection->usingNativeSchemaOperations()) {
-            $table = $this->connection->getTablePrefix().$table;
+        $table = $this->connection->getTablePrefix().$table;
 
-            return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
-        }
-
-        $columns = $this->getColumns($table);
-
-        foreach ($columns as $value) {
-            if (strtolower($value['name']) === $column) {
-                return $fullDefinition ? $value['type'] : $value['type_name'];
-            }
-        }
-
-        throw new InvalidArgumentException("There is no column with name '$column' on table '$table'.");
+        return $this->connection->getDoctrineColumn($table, $column)->getType()->getName();
     }
 
     /**
@@ -305,22 +132,11 @@ class Builder
      */
     public function getColumnListing($table)
     {
-        return array_column($this->getColumns($table), 'name');
-    }
+        $results = $this->connection->selectFromWriteConnection($this->grammar->compileColumnListing(
+            $this->connection->getTablePrefix().$table
+        ));
 
-    /**
-     * Get the columns for a given table.
-     *
-     * @param  string  $table
-     * @return array
-     */
-    public function getColumns($table)
-    {
-        $table = $this->connection->getTablePrefix().$table;
-
-        return $this->connection->getPostProcessor()->processColumns(
-            $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table))
-        );
+        return $this->connection->getPostProcessor()->processColumnListing($results);
     }
 
     /**
@@ -378,20 +194,6 @@ class Builder
     }
 
     /**
-     * Drop columns from a table schema.
-     *
-     * @param  string  $table
-     * @param  string|array  $columns
-     * @return void
-     */
-    public function dropColumns($table, $columns)
-    {
-        $this->table($table, function (Blueprint $blueprint) use ($columns) {
-            $blueprint->dropColumn($columns);
-        });
-    }
-
-    /**
      * Drop all tables from the database.
      *
      * @return void
@@ -425,6 +227,18 @@ class Builder
     public function dropAllTypes()
     {
         throw new LogicException('This database driver does not support dropping all types.');
+    }
+
+    /**
+     * Get all of the table names for the database.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function getAllTables()
+    {
+        throw new LogicException('This database driver does not support getting all tables.');
     }
 
     /**
@@ -466,23 +280,6 @@ class Builder
     }
 
     /**
-     * Disable foreign key constraints during the execution of a callback.
-     *
-     * @param  \Closure  $callback
-     * @return mixed
-     */
-    public function withoutForeignKeyConstraints(Closure $callback)
-    {
-        $this->disableForeignKeyConstraints();
-
-        try {
-            return $callback();
-        } finally {
-            $this->enableForeignKeyConstraints();
-        }
-    }
-
-    /**
      * Execute the blueprint to build / modify the table.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -510,7 +307,36 @@ class Builder
             return call_user_func($this->resolver, $table, $callback, $prefix);
         }
 
-        return Container::getInstance()->make(Blueprint::class, compact('table', 'callback', 'prefix'));
+        return new Blueprint($table, $callback, $prefix);
+    }
+
+    /**
+     * Register a custom Doctrine mapping type.
+     *
+     * @param  string  $class
+     * @param  string  $name
+     * @param  string  $type
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \RuntimeException
+     */
+    public function registerCustomDoctrineType($class, $name, $type)
+    {
+        if (! $this->connection->isDoctrineAvailable()) {
+            throw new RuntimeException(
+                'Registering a custom Doctrine type requires Doctrine DBAL (doctrine/dbal).'
+            );
+        }
+
+        if (! Type::hasType($name)) {
+            Type::addType($name, $class);
+
+            $this->connection
+                ->getDoctrineSchemaManager()
+                ->getDatabasePlatform()
+                ->registerDoctrineTypeMapping($type, $name);
+        }
     }
 
     /**

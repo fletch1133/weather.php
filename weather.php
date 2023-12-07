@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Weather extends Model {
     protected $table = 'weathers';
     protected $primaryKey = 'id';
-    public $timestamps = false;
+    public $timestamps = false; 
 
     protected $fillable = [
         'location', 
@@ -21,7 +21,7 @@ class Weather extends Model {
         'location' => [
             'type' => 'string',
             'length' => 200,
-            'nullable' = false,
+            'nullable' => false,
         ],
 
         'temperature' => [
@@ -88,13 +88,13 @@ class Country extends Model {
             'type' => 'string',
             'length' => 100,
             'nullable' => false,
-        ]
+        ],
         
         'city' => [
             'type' => 'string',
             'length' => 100,
             'nullable' => false,
-        ]
+        ],
 
         'user_id' => [
             'type' => 'integer',
@@ -128,8 +128,8 @@ class City extends Model {
         'country' => [
             'type' => 'string',
             'length' => 100,
-            'nullbale' => false,
-        ]
+            'nullable' => false,
+        ],
 
         'user_id' => [
             'type' => 'integer',

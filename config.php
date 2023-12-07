@@ -1,7 +1,7 @@
 <?php
 
 return [
-'apiKey' => 'd1c4f27fc31bce1425a6079e248a8bde';
+'apiKey' => ['d1c4f27fc31bce1425a6079e248a8bde'],
 
 'cities' => ['New York, New York, United States',
             'London, England',
@@ -13,7 +13,6 @@ return [
             'Shanghi, China',
             'Rome, Italy',
             'Los Angeles, California, United States'
-    ], 
+    ],
 ];
-
 ?>

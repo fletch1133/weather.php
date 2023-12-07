@@ -34,6 +34,9 @@ $capsule->bootEloquent();
 
 
 Capsule::schema()->dropIfExists('weathers');
+//Uses Capsule builder to drop weathers table if already exists, dropIfExists mth.
+//Way to check existence of table and drop if does
+
 Capsule::schema()->create('weathers', function (Blueprint $table) {
     $table->increments('id');
     $table->string('location');
@@ -43,6 +46,8 @@ Capsule::schema()->create('weathers', function (Blueprint $table) {
     $table->string('conditions');
     $table->timestamps();
 });
+//Creates new weathers table using create meth. closure func defines table structure
+//Using blueprint instance, specifies columns - eq id, location -
 
 
 //Load data from JSON

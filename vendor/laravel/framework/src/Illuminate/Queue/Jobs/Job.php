@@ -2,14 +2,10 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Bus\Batchable;
-use Illuminate\Bus\BatchRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\ManuallyFailedException;
-use Illuminate\Queue\TimeoutExceededException;
 use Illuminate\Support\InteractsWithTime;
-use Throwable;
 
 abstract class Job
 {
@@ -123,7 +119,7 @@ abstract class Job
     }
 
     /**
-     * Release the job back into the queue after (n) seconds.
+     * Release the job back into the queue.
      *
      * @param  int  $delay
      * @return void
@@ -187,25 +183,6 @@ abstract class Job
             return;
         }
 
-        $commandName = $this->payload()['data']['commandName'] ?? false;
-
-        // If the exception is due to a job timing out, we need to rollback the current
-        // database transaction so that the failed job count can be incremented with
-        // the proper value. Otherwise, the current transaction will never commit.
-        if ($e instanceof TimeoutExceededException &&
-            $commandName &&
-            in_array(Batchable::class, class_uses_recursive($commandName))) {
-            $batchRepository = $this->resolve(BatchRepository::class);
-
-            if (method_exists($batchRepository, 'rollBack')) {
-                try {
-                    $batchRepository->rollBack();
-                } catch (Throwable $e) {
-                    // ...
-                }
-            }
-        }
-
         try {
             // If the job has failed, we will delete it, call the "failed" method and then call
             // an event indicating the job has failed so it can be logged if needed. This is
@@ -233,7 +210,7 @@ abstract class Job
         [$class, $method] = JobName::parse($payload['job']);
 
         if (method_exists($this->instance = $this->resolve($class), 'failed')) {
-            $this->instance->failed($payload['data'], $e, $payload['uuid'] ?? '');
+            $this->instance->failed($payload['data'], $e);
         }
     }
 
@@ -289,23 +266,13 @@ abstract class Job
     }
 
     /**
-     * Determine if the job should fail when it timeouts.
+     * Get the number of seconds to delay a failed job before retrying it.
      *
-     * @return bool
+     * @return int|null
      */
-    public function shouldFailOnTimeout()
+    public function delaySeconds()
     {
-        return $this->payload()['failOnTimeout'] ?? false;
-    }
-
-    /**
-     * The number of seconds to wait before retrying a job that encountered an uncaught exception.
-     *
-     * @return int|int[]|null
-     */
-    public function backoff()
-    {
-        return $this->payload()['backoff'] ?? $this->payload()['delay'] ?? null;
+        return $this->payload()['delay'] ?? null;
     }
 
     /**
@@ -323,9 +290,9 @@ abstract class Job
      *
      * @return int|null
      */
-    public function retryUntil()
+    public function timeoutAt()
     {
-        return $this->payload()['retryUntil'] ?? null;
+        return $this->payload()['timeoutAt'] ?? null;
     }
 
     /**
